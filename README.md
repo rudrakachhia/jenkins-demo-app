@@ -6,7 +6,7 @@ A Node.js (Express) app built, tested and deployed as a Docker container by a **
 | Stage | What it does |
 |---|---|
 | Checkout | Pulls the code from Git |
-| Build & Test | Runs `npm ci` and `npm test` inside a `node:20-alpine` container |
+| Build & Test | `docker build --target test` runs `npm ci` and `npm test` inside the Dockerfile's test stage (fails the pipeline if tests fail) |
 | Docker Build | Builds image `jenkins-demo-app:<build#>` and `:latest` |
 | Deploy | Replaces the running container and runs a health check on `/health` |
 
@@ -22,7 +22,7 @@ docker run -d --name jenkins -p 8080:8080 -p 50000:50000 \
 # install the Docker CLI inside the Jenkins container
 docker exec -u root jenkins bash -c "apt-get update && apt-get install -y docker.io"
 ```
-Open http://localhost:8080, unlock with `docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword`, and install suggested plugins plus **Docker Pipeline**.
+Open http://localhost:8080, unlock with `docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword`, and install the suggested plugins (no extra plugins needed; only the Docker CLI inside the Jenkins container).
 
 ## Create the job
 1. New Item → **Pipeline** → name it `jenkins-demo-app`.

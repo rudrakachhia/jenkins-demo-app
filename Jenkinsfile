@@ -7,7 +7,6 @@ pipeline {
     }
 
     // Poll the repo every 2 minutes for new commits (works without a public webhook URL).
-    // If Jenkins is reachable from GitHub, use a webhook + githubPush() instead.
     triggers {
         pollSCM('H/2 * * * *')
     }
@@ -25,13 +24,11 @@ pipeline {
             }
         }
 
+        // Builds only the "test" stage of the Dockerfile (npm ci + npm test).
+        // If any test fails, this stage fails and the pipeline stops.
         stage('Build & Test') {
-            agent {
-                docker { image 'node:20-alpine' }
-            }
             steps {
-                sh 'npm ci'
-                sh 'npm test'
+                sh 'docker build --target test -t ${IMAGE_NAME}-test:${BUILD_NUMBER} .'
             }
         }
 
